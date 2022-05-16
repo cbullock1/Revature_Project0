@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface TransactionDAO {
+    public List<Transaction> transactionOverview(User Employee);
     public void singleAccount(User customer, String trans, double amount) throws SQLException;
     public void transferInitial(User sender, String recipient, double amount);
     public void chargeInitial(User sender, String recipient, double amount);

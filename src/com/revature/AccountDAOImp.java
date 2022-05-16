@@ -12,7 +12,7 @@ public class AccountDAOImp implements AccountDAO{
     }
 
     @Override
-    public void createAccount(User customer, double initialB) {
+    public boolean createAccount(User customer, double initialB) {
         if(initialB >= 0) {
             try {
                 String sql = "INSERT INTO accounts (balance, userName) VALUES(?,?)";
@@ -23,7 +23,8 @@ public class AccountDAOImp implements AccountDAO{
                 int rows = preparedStatement.executeUpdate();
 
                 if (rows != 0) {
-                    System.out.println("ACCOUNT CREATION SUCCESSFUL");
+                    System.out.println("ACCOUNT CREATION SUCCESSFUL\n");
+                    return true;
                 }
 
             } catch (SQLException sqlE) {
@@ -34,6 +35,7 @@ public class AccountDAOImp implements AccountDAO{
             System.err.println("ACCOUNT CREATION FAILED: Initial Balance cannot be Negative");
         }
         System.out.println();
+        return false;
     }
 
     @Override

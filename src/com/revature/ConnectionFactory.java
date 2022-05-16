@@ -24,9 +24,14 @@ public class ConnectionFactory {
             connection = DriverManager.getConnection(Url, user, pass);
 
             //After opening the connection run custom table creaton
-            String sql = "CALL sp_CreateTables_AND_Set_User_Key";
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(sql);
+            try {
+                String sql = "CALL sp_CreateTables_AND_Set_User_Key";
+                Statement statement = connection.createStatement();
+                statement.executeUpdate(sql);
+            }catch (SQLException sqlException){
+                System.err.println("Users, Accounts, and Transactions tables already exist");
+                System.err.println("Please allow the program to run to completion to start with fresh tables\n");
+            }
 
         }
         return connection;

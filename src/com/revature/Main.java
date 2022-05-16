@@ -30,6 +30,7 @@ public class Main {
             System.out.println("Type 1 to view all the current customers");
             System.out.println("Type 2 to view all of the accounts for a specific customer");
             System.out.println("Type 3 to change the status of the customer account");
+            System.out.println("Type 4 to View all Customer Transactions");
             System.out.println("Type anything else to loggout");
             System.out.println();
             try {
@@ -63,6 +64,19 @@ public class Main {
                             String handle = scanner.next();
                         }
                         break;
+                    case 4:
+                        System.out.println("These are the transactions at the moment of the call: ");
+                        List<Transaction> transactionsSummary = transactionDAO.transactionOverview(employee);
+                        if (transactionsSummary.size() > 0) {
+                            for (Transaction transaction : transactionsSummary) {
+                                System.out.println(transaction.toString());
+                            }
+                        }
+                        else
+                            System.out.println("There has been no Transactions Among user accounts");
+                        System.out.println();
+                        break;
+
                     default:
                         System.out.println("Logging Out.....");
                 }
@@ -89,6 +103,7 @@ public class Main {
             System.out.println("7. Send a Payment to another User Account");
             System.out.println("8. Check for Pending Transactions");
             System.out.println("9. Check for Unacknowledged Transactions");
+            System.out.println("10. Check Transaction History");
             System.out.println("Any other input will equate to a Log out request");
             try {
                 int choice = scanner.nextInt();
@@ -97,8 +112,8 @@ public class Main {
                         System.out.println("Please enter an initial balance");
                         try {
                             double balance = scanner.nextDouble();
-                            accountDAO.createAccount(customer, balance);
-                            transactionDAO.singleAccount(customer, "Create", balance);
+                            if(accountDAO.createAccount(customer, balance))
+                                transactionDAO.singleAccount(customer, "Create", balance);
                         }catch (InputMismatchException bal){
                             System.err.println("Input for this option must be an Double");
                             System.out.println();
@@ -107,132 +122,190 @@ public class Main {
                         break;
                     case 2:
                         List<Account> accounts = accountDAO.getAllUserAccounts(customer.getUsername());
-                        for (Account account : accounts)
-                            System.out.println(account.toString());
+                        if(accounts.size() != 0) {
+                            for (Account account : accounts)
+                                System.out.println(account.toString());
+                        }
+                        else
+                            System.out.println("You have no accounts under your User\n");
                         System.out.println();
                         break;
                     case 3:
-                        System.out.println("Please input the ID of the account you wish to see the balance of");
-                        try {
-                            int id = scanner.nextInt();
-                            Account account = accountDAO.findAccountByID(customer,id);
-                            if(account != null) {
-                                DecimalFormat money = new DecimalFormat("#.00");
-                                System.out.println("The balance of the " + account.getAccountID() + " account is $" + money.format(account.getBalance()) + ".");
+                        List<Account> accountCheck = accountDAO.getAllUserAccounts(customer.getUsername());
+                        if(accountCheck.size() > 0) {
+                            System.out.println("Please input the ID of the account you wish to see the balance of");
+                            try {
+                                int id = scanner.nextInt();
+                                Account account = accountDAO.findAccountByID(customer, id);
+                                if (account != null) {
+                                    DecimalFormat money = new DecimalFormat("#.00");
+                                    System.out.println("The balance of the " + account.getAccountID() + " account is $" + money.format(account.getBalance()) + ".");
+                                    System.out.println();
+                                }
+                            } catch (InputMismatchException inE) {
+                                System.err.println("The input of this option must be an integer");
                                 System.out.println();
+                                String clear = scanner.next();
                             }
-                        }catch (InputMismatchException inE){
-                            System.err.println("The input of this option must be an integer");
-                            System.out.println();
-                            String clear = scanner.next();
+                        }
+                        else {
+                            System.err.println("ACCOUNT ERROR: Need an to make an account before viewing balances\n");
                         }
                         break;
                     case 4:
-                        System.out.println("Please enter the ID of the Account you wish to deposit money into");
-                        try {
-                            int DepositID = scanner.nextInt();
-                            System.out.println("Please enter the amount you wish to deposit");
-                            double DepositAmount = scanner.nextDouble();
-                            if(accountDAO.deposit(customer, DepositID, DepositAmount))
-                                transactionDAO.singleAccount(customer, "Deposit", DepositAmount);
-                        }catch (InputMismatchException miss){
-                            System.err.println("Input for this operation must be an integer");
-                            System.out.println();
-                            String clear = scanner.next();
+                        accountCheck = accountDAO.getAllUserAccounts(customer.getUsername());
+                        if(accountCheck.size() > 0) {
+                            System.out.println("Please enter the ID of the Account you wish to deposit money into");
+                            try {
+                                int DepositID = scanner.nextInt();
+                                System.out.println("Please enter the amount you wish to deposit");
+                                double DepositAmount = scanner.nextDouble();
+                                if (accountDAO.deposit(customer, DepositID, DepositAmount))
+                                    transactionDAO.singleAccount(customer, "Deposit", DepositAmount);
+                            } catch (InputMismatchException miss) {
+                                System.err.println("Input for this operation must be an integer");
+                                System.out.println();
+                                String clear = scanner.next();
+                            }
+                        }
+                        else {
+                            System.err.println("DEPOSIT ERROR: Need an to make an account before depositing\n");
                         }
                         break;
                     case 5:
-                        System.out.println("Please enter the ID of the Account you wish to withdraw money from");
-                        try {
-                            int WithdrawID = scanner.nextInt();
-                            System.out.println("Please enter the amount you wish to withdraw");
-                            double WithdrawAmount = scanner.nextDouble();
-                            if(accountDAO.withdraw(customer, WithdrawID, WithdrawAmount))
-                                transactionDAO.singleAccount(customer, "Withdraw", WithdrawAmount);
-                        }catch (InputMismatchException miss) {
-                            System.err.println("Input for this operation must be an integer");
-                            System.out.println();
-                            String clear = scanner.next();
+                        accountCheck = accountDAO.getAllUserAccounts(customer.getUsername());
+                        if(accountCheck.size() > 0) {
+                            System.out.println("Please enter the ID of the Account you wish to withdraw money from");
+                            try {
+                                int WithdrawID = scanner.nextInt();
+                                System.out.println("Please enter the amount you wish to withdraw");
+                                double WithdrawAmount = scanner.nextDouble();
+                                if (accountDAO.withdraw(customer, WithdrawID, WithdrawAmount))
+                                    transactionDAO.singleAccount(customer, "Withdraw", WithdrawAmount);
+                            } catch (InputMismatchException miss) {
+                                System.err.println("Input for this operation must be an integer");
+                                System.out.println();
+                                String clear = scanner.next();
+                            }
+                        }
+                        else{
+                            System.err.println("WITHDRAW ERROR: Need an to make an account before withdrawing\n");
                         }
                         break;
                     case 6:
-                        System.out.println("Please enter the user name of the person you wish to charge");
-                        String recipient = scanner.next();
-                        System.out.println("Please enter the amount you wish to charge");
-                        try {
-                            double amount = scanner.nextDouble();
-                            transactionDAO.chargeInitial(customer, recipient, amount);
-                        }catch (InputMismatchException miss) {
-                            System.err.println("Input for this operation must be an double");
-                            System.out.println();
-                            String clear = scanner.next();
+                        accountCheck = accountDAO.getAllUserAccounts(customer.getUsername());
+                        if(accountCheck.size() > 0) {
+                            System.out.println("Please enter the user name of the person you wish to charge");
+                            String recipient = scanner.next();
+                            System.out.println("Please enter the amount you wish to charge");
+                            try {
+                                double amount = scanner.nextDouble();
+                                transactionDAO.chargeInitial(customer, recipient, amount);
+                            } catch (InputMismatchException miss) {
+                                System.err.println("Input for this operation must be an double");
+                                System.out.println();
+                                String clear = scanner.next();
+                            }
+                        }
+                        else {
+                            System.err.println("Transaction ERROR: Need an to make an account before making a transaction\n");
                         }
                         break;
                     case 7:
-                        System.out.println("Please enter the user name of the person you wish to Transfer money to");
-                        String rec = scanner.next();
-                        System.out.println("Please enter the amount you wish to transfer");
-                        try {
-                            double amt = scanner.nextDouble();
-                            transactionDAO.transferInitial(customer,rec, amt);
-                        }catch (InputMismatchException miss) {
-                            System.err.println("Input for this operation must be an Double");
-                            System.out.println();
-                            String clear = scanner.next();
+                        accountCheck = accountDAO.getAllUserAccounts(customer.getUsername());
+                        if(accountCheck.size() > 0) {
+                            System.out.println("Please enter the user name of the person you wish to Transfer money to");
+                            String rec = scanner.next();
+                            System.out.println("Please enter the amount you wish to transfer");
+                            try {
+                                double amt = scanner.nextDouble();
+                                transactionDAO.transferInitial(customer, rec, amt);
+                            } catch (InputMismatchException miss) {
+                                System.err.println("Input for this operation must be an Double");
+                                System.out.println();
+                                String clear = scanner.next();
+                            }
+                        }
+                        else {
+                            System.err.println("TRANSACTION ERROR: Need to make an account before making an transaction\n");
                         }
                         break;
                     case 8:
-                        List<Transaction> transactions = transactionDAO.PendingTransactions(customer);
-                        for (Transaction tran : transactions) {
-                            System.out.println(tran.toString());
-                        }
-                        if (transactions.size() > 0) {
-                            System.out.println("You have some pending transaction would you like to handle one of them");
-                            System.out.println("Y/N. Anything other input will be taken as N");
-                            String userCase = scanner.next();
-                            switch (userCase.toUpperCase()) {
-                                case "Y":
-                                    System.out.println("Please enter the ID of the Transaction you wish to handle");
-                                    try {
-                                        int transId = scanner.nextInt();
-                                        transactionDAO.PendingTransaction_handler(customer, transId);
-                                    }catch (InputMismatchException miss) {
-                                        System.err.println("Input for this operation must be an integer");
-                                        System.out.println();
-                                        String clear = scanner.next();
-                                    }
-                                    break;
-                                default:
-                                    System.out.println("Returning to main options");
+                        accountCheck = accountDAO.getAllUserAccounts(customer.getUsername());
+                        if(accountCheck.size() > 0) {
+                            List<Transaction> transactions = transactionDAO.PendingTransactions(customer);
+                            for (Transaction tran : transactions) {
+                                System.out.println(tran.toString());
                             }
+                            if (transactions.size() > 0) {
+                                System.out.println("You have some pending transaction would you like to handle one of them");
+                                System.out.println("Y/N. Anything other input will be taken as N");
+                                String userCase = scanner.next();
+                                switch (userCase.toUpperCase()) {
+                                    case "Y":
+                                        System.out.println("Please enter the ID of the Transaction you wish to handle");
+                                        try {
+                                            int transId = scanner.nextInt();
+                                            transactionDAO.PendingTransaction_handler(customer, transId);
+                                        } catch (InputMismatchException miss) {
+                                            System.err.println("Input for this operation must be an integer");
+                                            System.out.println();
+                                            String clear = scanner.next();
+                                        }
+                                        break;
+                                    default:
+                                        System.out.println("Returning to main options");
+                                }
+                            }
+                        }
+                        else {
+                            System.err.println("TRANSACTION ERROR: Need to make an account before making an transaction\n");
                         }
                         break;
 
                     case 9:
-                        transactions = transactionDAO.UnNotifiedTransactions(customer);
-                        for (Transaction tran : transactions) {
-                            System.out.println(tran.toString());
-                        }
-                        if (transactions.size() > 0) {
-                            System.out.println("You have some Unacknowledged transactions would you like to handle one of them");
-                            System.out.println("Y/N. Anything other input will be taken as N");
-                            String userCase = scanner.next();
-                            switch (userCase.toUpperCase()) {
-                                case "Y":
-                                    System.out.println("Please enter the ID of the Transaction you wish to Acknowledge");
-                                    try {
-                                        int transId = scanner.nextInt();
-                                        transactionDAO.transaction_notified_handler(customer, transId);
-                                    }catch (InputMismatchException miss) {
-                                        System.out.println("Input for this operation must be an integer");
-                                        System.out.println();
-                                        String clear = scanner.next();
-                                    }
-                                    break;
-                                default:
-                                    System.out.println("Returning to main options");
+                        accountCheck = accountDAO.getAllUserAccounts(customer.getUsername());
+                        if(accountCheck.size() > 0) {
+                            List<Transaction> transactions = transactionDAO.UnNotifiedTransactions(customer);
+                            for (Transaction tran : transactions) {
+                                System.out.println(tran.toString());
+                            }
+                            if (transactions.size() > 0) {
+                                System.out.println("You have some Unacknowledged transactions would you like to handle one of them");
+                                System.out.println("Y/N. Anything other input will be taken as N");
+                                String userCase = scanner.next();
+                                switch (userCase.toUpperCase()) {
+                                    case "Y":
+                                        System.out.println("Please enter the ID of the Transaction you wish to Acknowledge");
+                                        try {
+                                            int transId = scanner.nextInt();
+                                            transactionDAO.transaction_notified_handler(customer, transId);
+                                        } catch (InputMismatchException miss) {
+                                            System.out.println("Input for this operation must be an integer");
+                                            System.out.println();
+                                            String clear = scanner.next();
+                                        }
+                                        break;
+                                    default:
+                                        System.out.println("Returning to main options");
+                                }
                             }
                         }
+                        else {
+                            System.err.println("TRANSACTION ERROR: Need to make an account before making an transaction\n");
+                        }
+                        break;
+
+                    case 10:
+                        System.out.println("Your Transaction history at the time of call is:");
+                        List<Transaction>transactionHist = transactionDAO.transactionHistory(customer);
+                        if(transactionHist.size() > 0) {
+                            for (Transaction transaction : transactionHist)
+                                System.out.println(transaction.toString());
+                        }
+                        else
+                            System.out.println("You haven't done anything with this User");
+                        System.out.println();
                         break;
 
                     default:

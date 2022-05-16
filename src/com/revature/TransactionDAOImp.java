@@ -41,6 +41,21 @@ public class TransactionDAOImp implements TransactionDAO{
 
 
     @Override
+    public List<Transaction> transactionOverview(User Employee) {
+        try {
+            String sql = "SELECT * FROM transactions";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            List<Transaction> transactions = new ArrayList<>();
+            if(Employee.getUsertype().equals("Employee"))
+                return makeTransactionList(preparedStatement, transactions);
+
+        }catch (SQLException sqlE){
+            sqlE.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public void singleAccount(User customer, String trans, double amount) throws SQLException {
         String sql = "INSERT INTO transactions (sender, type, recipient, amount, status, notify) VALUES(?,?,?,?,?,?)";
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
