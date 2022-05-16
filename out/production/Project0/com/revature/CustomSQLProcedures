@@ -1,0 +1,20 @@
+DELIMITER //
+create procedure sp_Clear_Tables()
+BEGIN
+ DROP TABLE accounts;
+ DROP TABLE transactions;
+ DROP TABLE users;
+ END //
+Delimiter ;
+
+
+DELIMITER //
+create procedure sp_CreateTables_AND_Set_User_Key()
+BEGIN
+CREATE TABLE users(id integer primary key auto_increment, LastName char(50) not null, FirstName char(50) not null, userName char(50) UNIQUE not null, password char(50) not null, accountType enum('Customer','Employee') not null, status enum('PENDING','APPROVED','REJECTED') not null);
+CREATE TABLE accounts(accountID integer primary key auto_increment, balance double not null, userName char(50), CONSTRAINT fk_userNames FOREIGN KEY(userName) REFERENCES users(userName));
+CREATE TABLE transactions(transID integer primary key auto_increment, sender char(50) not null, type enum('Charge','Create','Deposit','Payment','Withdraw') not null, recipient char(50) not null, amount double not null, status enum('Pending','Approved','Rejected') not null, time timestamp default current_timestamp, notify enum('Not Notified','Notified') not null, Constraint FK_senders Foreign Key(sender) REFERENCES users(userName), CONSTRAINT fk_recievers FOREIGN KEY(recipient) REFERENCES users(userName));
+INSERT INTO users (LastName, FirstName, userName, password, accountType, status) VALUES('Revature','Connor','Trainee1','Project0LetsGo','Employee', 'Approved');
+ END //
+Delimiter ;
+
