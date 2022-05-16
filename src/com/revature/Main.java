@@ -70,6 +70,7 @@ public class Main {
                         if (transactionsSummary.size() > 0) {
                             for (Transaction transaction : transactionsSummary) {
                                 System.out.println(transaction.toString());
+                                System.out.println();
                             }
                         }
                         else

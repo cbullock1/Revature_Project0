@@ -1,6 +1,7 @@
 package com.revature;
 
 import java.sql.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,6 +114,30 @@ public class AccountDAOImp implements AccountDAO{
             System.err.println("WITHDRAWAL FAILED: Account ID cannot be less than 1");
         }
         System.out.println();
+        return false;
+    }
+
+    @Override
+    public boolean checkAmounts(User customer, double amount) {
+        DecimalFormat money = new DecimalFormat("#.00");
+        try {
+            String sql = "SELECT * FROM accounts WHERE userName = ? AND balance >= ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, customer.getUsername());
+            preparedStatement.setDouble(2,amount);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()){
+                System.out.println("RECOMENDATION: Your account with the ID of " + resultSet.getInt("accountID") + " has a balance of $" + money.format(resultSet.getDouble("balance")));
+                while (resultSet.next()){
+                    System.out.println("RECOMENDATION: Your account with the ID of " + resultSet.getInt("accountID") + " has a balance of $" + money.format(resultSet.getDouble("balance")));
+                }
+                return true;
+            }
+
+        }catch (SQLException sqlE){
+
+        }
         return false;
     }
 

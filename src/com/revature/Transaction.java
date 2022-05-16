@@ -33,18 +33,16 @@ public class Transaction {
 
     @Override
     public String toString() {
-        DecimalFormat money = new DecimalFormat("#.00");
         return "Transaction{" +
                 "TransactionID=" + TransactionID +
                 ", Sender='" + Sender + '\'' +
                 ", transType='" + transType + '\'' +
                 ", recipient='" + recipient + '\'' +
-                ", amount=" + money.format(amount) +
+                ", amount=" + amount +
                 ", status='" + status + '\'' +
                 ", timestamp='" + timestamp + '\'' +
+                ", notify='" + notify + '\'' +
                 '}';
-        //String format = "[%12d|%10s|%15s|%10s|%13s|%10s|%10s]";
-        //return String.format(format, TransactionID, Sender, transType, recipient, money.format(amount), status, timestamp, notify);
     }
 
     public int getTransactionID() {

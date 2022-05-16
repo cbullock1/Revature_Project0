@@ -239,16 +239,27 @@ public class TransactionDAOImp implements TransactionDAO{
                                         System.out.println("Please input the Account you wish to input the funds into");
                                         account = scanner.nextInt();
                                     }while (!accountDAO.deposit(customer, account, amount));
+
+                                    sql = "UPDATE transactions SET status = 'Approved' where transID = " + transactionID;
+                                    statement.executeUpdate(sql);
+                                    proceed = true;
+
                                 } else {
-                                    int account = 0;
-                                    do {
-                                        System.out.println("Please input the Account you wish to withdrawal the funds from");
-                                        account = scanner.nextInt();
-                                    }while (!accountDAO.withdraw(customer, account, amount));
+                                    if(accountDAO.checkAmounts(customer, amount)) {
+                                        int account = 0;
+                                        do {
+                                            System.out.println("Please input the Account you wish to withdrawal the funds from");
+                                            account = scanner.nextInt();
+                                        } while (!accountDAO.withdraw(customer, account, amount));
+                                        sql = "UPDATE transactions SET status = 'Approved' where transID = " + transactionID;
+                                        statement.executeUpdate(sql);
+                                        proceed = true;
+                                    }
+                                    else {
+                                        System.err.println("TRANASCTION ERROR: NONE OF YOU ACCOUNTS HAVE ENOUGH FUNDS FOR TRANSACTION!");
+                                        System.err.println("Please Reject Transaction");
+                                    }
                                 }
-                                sql = "UPDATE transactions SET status = 'Approved' where transID = " + transactionID;
-                                statement.executeUpdate(sql);
-                                proceed = true;
                                 break;
                             case "N":
                                 sql = "UPDATE transactions SET status = 'Rejected' where transID = " + transactionID;
