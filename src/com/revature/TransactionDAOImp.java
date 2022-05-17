@@ -91,7 +91,10 @@ public class TransactionDAOImp implements TransactionDAO{
         }catch (SQLException s){
             s.printStackTrace();
         }
-        if(exists) {
+
+        boolean possible = accountDAO.checkAmounts(sender, amount);
+
+        if(exists && possible) {
             System.out.println("What account ID do you wish to withdrawal from for the transfer");
             boolean passed = false;
             while (!passed) {
@@ -120,8 +123,9 @@ public class TransactionDAOImp implements TransactionDAO{
                         } catch (SQLException sqlE) {
                             sqlE.printStackTrace();
                         }
-                    } else {
-                        System.err.println("ACCOUNT NOT FOUND PLEASE REVIEW THE ACCOUNT'S ID");
+                    }
+                    else {
+                        System.err.println("Withdraw Failed please enter a different account");
                     }
 
                 } catch (InputMismatchException iMiss) {
@@ -131,7 +135,11 @@ public class TransactionDAOImp implements TransactionDAO{
             }
         }
         else {
-            System.err.println("TRASNFER FAILED: Recipient Account does not Exist");
+            if(!exists)
+                System.err.println("TRASNFER FAILED: Recipient Account does not Exist");
+            else {
+                System.err.println("TRASNFER FAILED: No account meets required withdraw amount");
+            }
         }
         System.out.println();
     }
