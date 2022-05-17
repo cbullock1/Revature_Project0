@@ -1,4 +1,4 @@
-Project 0
+## Readme Project 0
 
 The goal of this project was to create a console-based application that simulates banking operations. 
 A customer can apply for an account, view their balance, and make withdrawals and deposits. 
@@ -36,9 +36,9 @@ The tables are deleted upon program termination with sp_Clear_Tables.
 When running the program you will be prompted to enter input into multiple scanners. These scanners are tasked with determining which of the specified
 user story behaviors are to be ran. The scanners where implement with flow control statements and try/catch staments in order to handle any and all input.
 For multiple cases the failure of entering the desired input will be interpeted as no/logout requests, please read the prompts carefully.
-
 The users stories the program is emulating are listed below:
-## User Stories 
+
+# User Stories 
 * As a user, I can login.
 * As a customer, I can apply for a new bank account with a starting balance.
 * As a customer, I can view the balance of a specific account.
