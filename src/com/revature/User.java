@@ -94,7 +94,7 @@ public class User {
                 ", Username='" + Username + '\'' +
                 ", LastName='" + LastName + '\'' +
                 ", FirstName='" + FirstName + '\'' +
-                ", Password='" + Password + '\'' +
+                //", Password='" + Password + '\'' +
                 ", Usertype='" + Usertype + '\'' +
                 ", Status='" + Status + '\'' +
                 '}';
